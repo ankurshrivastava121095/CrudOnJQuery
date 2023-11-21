@@ -1,0 +1,95 @@
+<%- include('./components/header.ejs') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                <h4>Add New Student</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="name">Student Name*</label>
+                        <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="Enter Student Name" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="studentClass">Student Class*</label>
+                        <input type="number" class="form-control form-control-sm" name="studentClass" id="studentClass" placeholder="Enter Student Class" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="age">Student Age*</label>
+                        <input type="number" class="form-control form-control-sm" name="age" id="age" placeholder="Enter Student Age" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="email">Student Email*</label>
+                        <input type="text" class="form-control form-control-sm" name="email" id="email" placeholder="Enter Student Email" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="phone">Student Phone*</label>
+                        <input type="number" class="form-control form-control-sm" name="phone" id="phone" placeholder="Enter Student Phone" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="studentImage">Student Image*</label>
+                        <input type="file" class="form-control form-control-sm" name="studentImage" id="studentImage" required>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-sm" id="saveBtn">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#saveBtn').on('click', function () {
+            var formData = new FormData();
+
+            // Append form data
+            formData.append('name', $('#name').val());
+            formData.append('studentClass', $('#studentClass').val());
+            formData.append('age', $('#age').val());
+            formData.append('email', $('#email').val());
+            formData.append('phone', $('#phone').val());
+
+            var fileInput = $('#studentImage')[0];
+            formData.append('studentImage', fileInput.files[0]);
+
+            $.ajax({
+                url: 'http://localhost:3001/store',
+                method: 'POST',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log('Student saved successfully:', response);
+                    $('#name').val('')
+                    $('#studentClass').val('')
+                    $('#age').val('')
+                    $('#email').val('')
+                    $('#phone').val('')
+                    $('#studentImage').val('')
+                },
+                error: function (error) {
+                    console.log('Error saving student:', error);
+                }
+            });
+        });
+    });
+</script>
+
+<%- include('./components/footer.ejs') %>

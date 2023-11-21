@@ -1,0 +1,132 @@
+<%- include('./components/header.ejs') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                <h4>Edit Student</h4>
+            </div>
+            <div class="row">
+                <!-- Your form fields here -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="name">Student Name*</label>
+                        <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="Enter Student Name" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="studentClass">Student Class*</label>
+                        <input type="number" class="form-control form-control-sm" name="studentClass" id="studentClass" placeholder="Enter Student Class" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="age">Student Age*</label>
+                        <input type="number" class="form-control form-control-sm" name="age" id="age" placeholder="Enter Student Age" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="email">Student Email*</label>
+                        <input type="text" class="form-control form-control-sm" name="email" id="email" placeholder="Enter Student Email" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="phone">Student Phone*</label>
+                        <input type="number" class="form-control form-control-sm" name="phone" id="phone" placeholder="Enter Student Phone" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="newStudentImage">New Student Image</label>
+                        <input type="file" class="form-control form-control-sm" name="newStudentImage" id="newStudentImage">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <img id="currentImage" src="" alt="Current Student Image" style="max-height: 250px;">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-sm" id="saveBtn">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var currentImageSrc = "";
+
+        // Get the student ID from the URL path
+        var urlPath = window.location.pathname;
+        var parts = urlPath.split('/');
+        var studentId = parts[parts.length - 1];
+
+        $.ajax({
+            url: 'http://localhost:3001/fetchById/' + studentId,
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                currentImageSrc = data.data.studentImage.url;
+                populateForm(data?.data);
+            },
+            error: function (error) {
+                console.log('Error fetching student data:', error);
+            }
+        });
+
+        // Function to populate the form fields with student data
+        function populateForm(studentData) {
+            $('#name').val(studentData.name);
+            $('#studentClass').val(studentData.studentClass);
+            $('#age').val(studentData.age);
+            $('#email').val(studentData.email);
+            $('#phone').val(studentData.phone);
+
+            // Display the current image
+            $('#currentImage').attr('src', currentImageSrc);
+        }
+
+        // Event listener for the Save button
+        $('#saveBtn').on('click', function () {
+            var formData = new FormData();
+
+            formData.append('name', $('#name').val());
+            formData.append('studentClass', $('#studentClass').val());
+            formData.append('age', $('#age').val());
+            formData.append('email', $('#email').val());
+            formData.append('phone', $('#phone').val());
+
+            var newImageInput = $('#newStudentImage')[0];
+            if (newImageInput.files.length > 0) {
+                formData.append('studentImage', newImageInput.files[0]);
+            } else {
+                formData.append('studentImage', '');
+            }
+
+            // Send data to the server using AJAX
+            $.ajax({
+                url: 'http://localhost:3001/update/' + studentId,
+                method: 'PUT',
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log('Student updated successfully:', response);
+                },
+                error: function (error) {
+                    console.log('Error updating student:', error);
+                }
+            });
+        });
+    });
+</script>
+
+<%- include('./components/footer.ejs') %>
